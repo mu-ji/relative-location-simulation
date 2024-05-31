@@ -6,23 +6,24 @@ class RobotNode:
 
     def __init__(self,node_number):
         self.number = node_number
-        self.true_position = np.array([np.random.randint(0,100), np.random.randint(0,100)])
-        self.pseudo_position = np.array([np.random.randint(0,100), np.random.randint(0,100)])
+        self.true_position = np.array([np.random.randint(-50,50), np.random.randint(-50,50)])
+        self.pseudo_position = np.array([np.random.randint(-50,50), np.random.randint(-50,50)])
         self.measure_noise_mean = 0
-        self.measure_noise_var = 5
+        self.measure_noise_var = 1
         # 使用 'tab10' colormap 生成颜色
-        num_nodes = 10
-        cmap = plt.cm.get_cmap('tab10', num_nodes)
+        num_nodes = 20
+        cmap = plt.cm.get_cmap('tab20', num_nodes)
         self.color = cmap(np.linspace(0, 1, num_nodes))[node_number-1]
+        self.communicable_node_list = []
 
         
     def measure_distance_and_direction(self,target_node):
         direction = [(target_node.true_position[0] - self.true_position[0] + np.random.normal(self.measure_noise_mean, self.measure_noise_var)), (target_node.true_position[1] - self.true_position[1] + np.random.normal(self.measure_noise_mean,self.measure_noise_var))]
         return direction
     
-    def update_pseudo_position(self,target_nodes):
+    def update_pseudo_position(self):
         possibla_pseudo_position_list = []
-        for node in target_nodes:
+        for node in self.communicable_node_list:
             if node == self:
                 continue
             else:
@@ -45,3 +46,8 @@ class RobotNode:
     def correct_pseudo_position(self,x_error,y_error):
         self.pseudo_position[0] = self.pseudo_position[0] + x_error
         self.pseudo_position[1] = self.pseudo_position[1] + y_error
+
+    def allocate_communicable_node(self, communicable_node_list):
+        self.communicable_node_list = communicable_node_list
+
+    
