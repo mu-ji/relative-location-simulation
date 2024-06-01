@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import simulator_parameters
+import KF4single_node
 
 class RobotNode:
     "This class is used to set up the nodes in the simulation"
@@ -8,15 +10,21 @@ class RobotNode:
         self.number = node_number
         self.true_position = np.array([np.random.randint(-50,50), np.random.randint(-50,50)])
         self.pseudo_position = np.array([np.random.randint(-50,50), np.random.randint(-50,50)])
-        self.measure_noise_mean = 0
-        self.measure_noise_var = 1
+        self.measure_noise_mean = simulator_parameters.measure_noise_mean
+        self.measure_noise_var = simulator_parameters.measure_noise_var
         # 使用 'tab10' colormap 生成颜色
-        num_nodes = 20
-        cmap = plt.cm.get_cmap('tab20', num_nodes)
+        num_nodes = simulator_parameters.nodes_number
+        if num_nodes <= 10:
+            num_nodes = 10
+        cmap = plt.cm.get_cmap('tab{}'.format(num_nodes), num_nodes)
         self.color = cmap(np.linspace(0, 1, num_nodes))[node_number-1]
         self.communicable_node_list = []
 
-        
+        self.filter = KF4single_node.KalmanFilter(Q= 0, R= simulator_parameters.measure_noise_var, x0= self.pseudo_position)
+
+    def set_pseudo_position(self, position):
+        self.pseudo_position = position
+
     def measure_distance_and_direction(self,target_node):
         direction = [(target_node.true_position[0] - self.true_position[0] + np.random.normal(self.measure_noise_mean, self.measure_noise_var)), (target_node.true_position[1] - self.true_position[1] + np.random.normal(self.measure_noise_mean,self.measure_noise_var))]
         return direction

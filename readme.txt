@@ -39,5 +39,20 @@ Maybe it is possible to find the relationship between noise level, network compl
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+06/01/2024
+
+Update:
+
+Trying to implement a KF on each node to avoid random
+
+KF is in KF4single_node.py, the performance is not good, maybe not suit for KF. It works when there only two nodes, maybe can be used in second idea (Notion->research idea->multi target tracking->use some methods to locate some nodes, them use these nodes to locate others nearby, until all nodes are located)
 
 
+
+Action:
+
+avoid using true position to judge when is convergence, because in real situation, the true position is unknow
+
+find another optimization target
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

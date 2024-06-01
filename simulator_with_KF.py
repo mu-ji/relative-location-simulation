@@ -68,6 +68,7 @@ for i in range(number_of_node):
 for i in range(number_of_node):
     Nodes_list_copy = Nodes_list.copy()
     Nodes_list_copy.remove(Nodes_list[i])
+    print(Nodes_list_copy)
     communicable_node_list = random.sample(Nodes_list_copy, int(number_of_node*(simulator_parameters.communicable_rate)))
     Nodes_list[i].allocate_communicable_node(communicable_node_list)
 
@@ -93,14 +94,20 @@ while True:
     steps = steps + 1
     error_list = []
     for i in Nodes_list:
-        i.update_pseudo_position()
+        #i.update_pseudo_position()
+        i.filter.predict()
+        z = i.filter.generate_z_with_communicable_node_list(i.true_position, i.communicable_node_list)
+        i.filter.update(z, i.pseudo_position, i.communicable_node_list)
+
+        i.set_pseudo_position([i.filter.x[0][0],i.filter.x[1][0]])
+
         error_list.append(i.pseudo_error())
 
     error_cov_list.append(np.cov(np.array(error_list).T))
-    print(np.cov(np.array(error_list).T))
+    #print(np.cov(np.array(error_list).T))
 
     MSE_list.append(compute_MSE(Nodes_list))
-
+    print(compute_MSE(Nodes_list))
     plt.figure()
     for i in Nodes_list:
         i.draw_pseudo_position()
@@ -111,6 +118,7 @@ while True:
     plt.xlim(-200,200)
     plt.ylim(-200,200)
     plt.savefig('figure_buffer/step{}.png'.format(steps))
+    plt.close()
     
     #plt.show()
     
