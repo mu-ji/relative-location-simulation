@@ -6,12 +6,12 @@ import KF4single_node
 class RobotNode:
     "This class is used to set up the nodes in the simulation"
 
-    def __init__(self,node_number):
+    def __init__(self,measure_noise_mean, measure_noise_var, node_number):
         self.number = node_number
         self.true_position = np.array([np.random.randint(-50,50), np.random.randint(-50,50)])
         self.pseudo_position = np.array([np.random.randint(-50,50), np.random.randint(-50,50)])
-        self.measure_noise_mean = simulator_parameters.measure_noise_mean
-        self.measure_noise_var = simulator_parameters.measure_noise_var
+        self.measure_noise_mean = measure_noise_mean
+        self.measure_noise_var = measure_noise_var
         # 使用 'tab10' colormap 生成颜色
         num_nodes = simulator_parameters.nodes_number
         if num_nodes <= 10:
@@ -19,6 +19,7 @@ class RobotNode:
         cmap = plt.cm.get_cmap('tab{}'.format(num_nodes), num_nodes)
         self.color = cmap(np.linspace(0, 1, num_nodes))[node_number-1]
         self.communicable_node_list = []
+
 
         self.filter = KF4single_node.KalmanFilter(Q= 0, R= simulator_parameters.measure_noise_var, x0= self.pseudo_position)
 

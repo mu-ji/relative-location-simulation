@@ -56,3 +56,21 @@ avoid using true position to judge when is convergence, because in real situatio
 find another optimization target
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+06/03/2024
+
+Update:
+
+Implement a weighted simulator which have better performance than mean simulator, with weighted simulator, even noise is 5 can stll convergent.
+
+Plot a figure shows the relationship between noise level, communicable rate with MSE
+
+
+Action:
+
+Try to plot a figure, the relationship between nodes number and MSE
+
+Using math to prove it can works? (not sure) or model it as an optimazation problem
+
+need to find another optimization target which don't need true position
+

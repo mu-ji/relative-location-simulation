@@ -68,6 +68,7 @@ for i in range(number_of_node):
 for i in range(number_of_node):
     Nodes_list_copy = Nodes_list.copy()
     Nodes_list_copy.remove(Nodes_list[i])
+    print(Nodes_list_copy)
     communicable_node_list = random.sample(Nodes_list_copy, int(number_of_node*(simulator_parameters.communicable_rate)))
     Nodes_list[i].allocate_communicable_node(communicable_node_list)
 
@@ -88,19 +89,44 @@ plt.ylim(-200,200)
 plt.savefig('figure_buffer/start_states.png')
 plt.show()
 
+def update_pseudo_position_with_weight(node):
+    possible_position_list = []
+    possible_position_weight_list = []
+    for i in node.communicable_node_list:
+        direction_vector = node.measure_distance_and_direction(i)
+        possible_position = i.pseudo_position - direction_vector
+        possible_position_list.append(possible_position)
+        pseudo_direction_vector = i.pseudo_position - node.pseudo_position
+
+        weight = 1/np.linalg.norm(direction_vector - pseudo_direction_vector, ord = 2)
+        possible_position_weight_list.append(weight)
+    
+    possible_position_weight_array = np.array(possible_position_weight_list)/np.array(possible_position_weight_list).sum()
+    possible_position_array = np.array(possible_position_list)
+    #print(possible_position_weight_array.shape)
+    #print(possible_position_array.shape)
+    estimate_position = np.dot(possible_position_array.T, possible_position_weight_array)
+    node.set_pseudo_position(estimate_position)
+
+
+
 steps = 0
 while True:
     steps = steps + 1
     error_list = []
     for i in Nodes_list:
-        i.update_pseudo_position()
+        #i.update_pseudo_position()
+        update_pseudo_position_with_weight(i)
+
+        #i.set_pseudo_position([i.filter.x[0][0],i.filter.x[1][0]])
+
         error_list.append(i.pseudo_error())
 
     error_cov_list.append(np.cov(np.array(error_list).T))
-    print(np.cov(np.array(error_list).T))
+    #print(np.cov(np.array(error_list).T))
 
     MSE_list.append(compute_MSE(Nodes_list))
-
+    print(compute_MSE(Nodes_list))
     plt.figure()
     for i in Nodes_list:
         i.draw_pseudo_position()
@@ -111,9 +137,9 @@ while True:
     plt.xlim(-200,200)
     plt.ylim(-200,200)
     plt.savefig('figure_buffer/step{}.png'.format(steps))
+    plt.close()
     
     #plt.show()
-    
 
     if np.cov(np.array(error_list).T)[0][0] <= 1 and np.cov(np.array(error_list).T)[1][1] <= 1:
         x_error = (Nodes_list[0].true_position - Nodes_list[0].pseudo_position)[0]
